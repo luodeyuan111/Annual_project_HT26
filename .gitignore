@@ -8,3 +8,4 @@ __pycache__/
 
 # 忽略VS Code的个人配置
 .vscode/
+sensor_data/

@@ -1,0 +1,9 @@
+README.md
+setup.py
+Drone_Interface/Drone_Interface.py
+Drone_Interface/__init__.py
+Drone_Interface/rgb_data_extractor_utf8.py
+annual_project.egg-info/PKG-INFO
+annual_project.egg-info/SOURCES.txt
+annual_project.egg-info/dependency_links.txt
+annual_project.egg-info/top_level.txt

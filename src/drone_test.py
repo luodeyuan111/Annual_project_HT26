@@ -4,7 +4,11 @@ import cv2
 import os
 import time
 
+import sys
+sys.path.append('../')  # 将项目根目录添加到搜索路径
+
 from Drone_Interface.rgb_data_extractor_utf8 import RGBDataExtractor
+
 
 
 def main():
