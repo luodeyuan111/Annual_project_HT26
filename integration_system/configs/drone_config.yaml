@@ -1,0 +1,22 @@
+# 无人机配置
+drone:
+  connection:
+    host: "127.0.0.1"
+    port: 41451
+    timeout: 10
+  
+  camera:
+    camera_name: "0"
+    image_type: "Scene"
+    width: 640
+    height: 480
+  
+  control:
+    default_velocity: 2.0
+    takeoff_height: 5.0
+    safety_height: 2.0
+  
+  capture:
+    interval: 0.1
+    buffer_size: 2
+    save_raw: false

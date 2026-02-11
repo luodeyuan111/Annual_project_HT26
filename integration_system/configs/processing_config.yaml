@@ -1,0 +1,28 @@
+# 处理流程配置
+processing:
+  mode: 'interactive'  # interactive, single, batch
+  batch_size: 5
+  interval_between_frames: 0.1
+  interval_between_cycles: 1.0
+  
+  features:
+    extract_features: true
+    max_features: 1000
+    quality_level: 0.01
+    min_distance: 10
+  
+  segmentation:
+    use_depth: true
+    use_flow: true
+    min_segment_size: 10
+  
+  pose_estimation:
+    ransac_threshold: 0.05
+    ransac_max_iterations: 500
+    min_inliers: 10
+  
+  visualization:
+    show_live: true
+    save_figures: true
+    figure_size: [12, 8]
+    dpi: 150
