@@ -1,5 +1,3 @@
-#备份原配置文件（重要！）
-#用Visual Studio 2022（或任意文本编辑器）打开settings.json，替换原有内容为以下配置
 {
   "SeeDocsAt": "https://github.com/Microsoft/AirSim/blob/master/docs/settings.md",
   "SettingsVersion": 1.2,
@@ -7,9 +5,7 @@
   "Vehicles": {
     "Drone1": {
       "VehicleType": "SimpleFlight",
-      "X": 0,
-      "Y": 0,
-      "Z": 0,
+      "X": 0, "Y": 0, "Z": 0,
       "Cameras": {
         "front_camera": {
           "CaptureSettings": [
@@ -20,9 +16,9 @@
               "FOV_Degrees": 90
             }
           ],
-          "X": 0.25,
+          "X": 0.3,  // 前移并抬高
           "Y": 0.0,
-          "Z": -0.1,
+          "Z": 0.2,  // 避开螺旋桨遮挡
           "Pitch": 0.0,
           "Roll": 0.0,
           "Yaw": 0.0
@@ -37,8 +33,8 @@
             }
           ],
           "X": 0.0,
-          "Y": 0.25,
-          "Z": -0.1,
+          "Y": 0.3,  // 右移并抬高
+          "Z": 0.2,
           "Pitch": 0.0,
           "Roll": 0.0,
           "Yaw": 90.0
@@ -52,9 +48,9 @@
               "FOV_Degrees": 90
             }
           ],
-          "X": -0.25,
+          "X": -0.3, // 后移并抬高
           "Y": 0.0,
-          "Z": -0.1,
+          "Z": 0.2,
           "Pitch": 0.0,
           "Roll": 0.0,
           "Yaw": 180.0
@@ -69,8 +65,8 @@
             }
           ],
           "X": 0.0,
-          "Y": -0.25,
-          "Z": -0.1,
+          "Y": -0.3, // 左移并抬高
+          "Z": 0.2,
           "Pitch": 0.0,
           "Roll": 0.0,
           "Yaw": -90.0
@@ -80,3 +76,4 @@
   }
 }
 #按Ctrl+S保存settings.json，关闭编辑器。
+#内参矩阵为fx=320 fy=320 cx=320 cy=240
