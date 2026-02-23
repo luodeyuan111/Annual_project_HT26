@@ -253,7 +253,7 @@ class FlowProcessor:
         else:
             raise ValueError(f"不支持的返回类型: {return_type}")
     
-    def extract_feature_points(self, flow, grid_step=10, threshold=0.5):
+    def extract_feature_points(self, flow, grid_step=10, threshold=0.5, max_magnitude=50.0):
         """
         从光流场中提取特征点对
         
@@ -261,6 +261,7 @@ class FlowProcessor:
             flow: 光流场 [H, W, 2]
             grid_step: 网格采样步长
             threshold: 光流大小阈值（过滤静止点）
+            max_magnitude: 最大光流幅度（过滤不合理的值）
             
         Returns:
             points_t: t时刻的像素坐标 [N, 2]
@@ -284,14 +285,14 @@ class FlowProcessor:
         # 计算光流大小
         flow_magnitudes = np.linalg.norm(flow_vectors, axis=1)
         
-        # 过滤静止点（可选）
-        if threshold > 0:
-            mask = flow_magnitudes > threshold
-            points_t = points_t[mask]
-            flow_vectors = flow_vectors[mask]
-            flow_magnitudes = flow_magnitudes[mask]
-        else:
-            mask = np.ones(len(points_t), dtype=bool)
+        # 过滤条件：
+        # 1. 大于阈值（过滤静止点）
+        # 2. 小于最大幅度（过滤不合理的值，RAFT对合成图像可能估计错误）
+        mask = (flow_magnitudes > threshold) & (flow_magnitudes < max_magnitude)
+        
+        points_t = points_t[mask]
+        flow_vectors = flow_vectors[mask]
+        flow_magnitudes = flow_magnitudes[mask]
         
         # 计算t+1时刻的点
         points_t1 = points_t + flow_vectors

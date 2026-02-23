@@ -19,17 +19,19 @@ monodepth_path = os.path.join(project_root, 'models', 'monodepth2')
 if not os.path.exists(monodepth_path):
     monodepth_path = os.path.join(os.path.dirname(__file__), '../../../models/monodepth2')
 
-if monodepth_path not in sys.path:
-    sys.path.insert(0, monodepth_path)
+# 将 monodepth2 路径插入到 sys.path 最前面，优先于 src/utils
+sys.path.insert(0, monodepth_path)
 
 try:
+    # 直接导入，monodepth2路径在前面应该不会被src/utils干扰
     from networks import ResnetEncoder, DepthDecoder
     from layers import disp_to_depth
     from utils import download_model_if_doesnt_exist
+    print(f"Monodepth2模块加载成功: {monodepth_path}")
 except ImportError as e:
-    print(f"导入Monodepth2失败: {e}")
-    print("请确保Monodepth2已正确放置在models/monodepth2目录中")
-    sys.exit(1)
+    print(f"直接导入Monodepth2失败: {e}")
+    print("请检查Monodepth2路径和依赖")
+    raise
 
 class Monodepth2Estimator:
     """

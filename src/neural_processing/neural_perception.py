@@ -168,14 +168,26 @@ class NeuralPerception:
             # 计算光流统计
             flow_stats = self.flow_processor.compute_flow_statistics(flow_field)
             flow_magnitude = flow_stats['mean_magnitude']
-            flow_confidence = np.mean((flow_stats['mean_magnitude'] > 0.1) & (flow_stats['mean_magnitude'] < 20.0))
             
-            # 2. 提取特征点
+            # 修复：使用像素级光流幅度计算置信度，而非平均值
+            flow_mag_array = np.sqrt(flow_field[:,:,0]**2 + flow_field[:,:,1]**2)
+            
+            # 添加光流裁剪：过滤掉不合理的光流值（RAFT对合成图像可能估计错误）
+            # 100ms时间间隔，无人机速度10m/s，最大位移约1m
+            # 在640x480图像中，1m距离对应约100像素（假设焦距320）
+            max_flow_magnitude = 50.0  # 最大合理光流幅度（像素）
+            flow_mag_clipped = np.clip(flow_mag_array, 0.1, max_flow_magnitude)
+            
+            # 计算置信度：合理范围内的像素比例
+            flow_confidence = np.mean((flow_mag_array > 0.1) & (flow_mag_array < max_flow_magnitude))
+            
+            # 2. 提取特征点（添加最大光流幅度限制，过滤RAFT对合成图像的错误估计）
             feature_start = time.time()
             points_t, points_t1, flow_vectors, valid_mask = self.flow_processor.extract_feature_points(
                 flow_field, 
                 grid_step=self.config['feature_grid_step'],
-                threshold=self.config['flow_magnitude_threshold']
+                threshold=self.config['flow_magnitude_threshold'],
+                max_magnitude=max_flow_magnitude
             )
             feature_time = time.time() - feature_start
             

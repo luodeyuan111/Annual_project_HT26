@@ -1,277 +1,252 @@
-# 项目结构说明
+# 项目结构说明文档
 
-## 最终项目结构
+## 概述
+本文档描述了无人机视觉感知系统的项目结构、模块组织和导入依赖关系。
+
+## 项目根目录结构
 
 ```
-ANNUAL_PROJECT/
-├── config_manager.py           # ✅ 配置管理模块（已移到根目录）
-├── logging_utils.py            # ✅ 日志管理模块（已移到根目录）
-├── requirements.txt            # 项目依赖
-├── setup.py                    # 项目设置
-├── test_imports.py             # 导入测试脚本
-├── run_vision.bat              # 快速启动脚本
-├── README.md                   # 项目说明
-├── README_VISION.md            # 视觉处理说明
-│
-├── models/                     # 神经网络模型（网盘传输，不提交Git）
-│   ├── RAFT/                   # 光流估计模型
-│   │   ├── core/
-│   │   │   ├── __init__.py
-│   │   │   ├── raft.py
-│   │   │   ├── extractor.py
-│   │   │   ├── update.py
-│   │   │   └── corr.py
-│   │   ├── core/utils/
-│   │   │   ├── __init__.py
-│   │   │   ├── frame_utils.py
-│   │   │   ├── augmentor.py
-│   │   │   └── flow_viz.py
-│   │   └── models/
-│   │       └── raft-things.pth  # ⚠️ 大文件（忽略）
-│   │
-│   └── monodepth2/             # 深度估计模型
-│       ├── networks/
-│       │   ├── depth_decoder.py
-│       │   ├── pose_cnn.py
-│       │   ├── pose_decoder.py
-│       │   └── resnet_encoder.py
-│       ├── mono+stereo_640x192/
-│       │   ├── encoder.pth     # ⚠️ 大文件（忽略）
-│       │   ├── depth.pth       # ⚠️ 大文件（忽略）
-│       │   └── ...
-│       └── ...
-│
-├── src/                        # 源代码（GitHub同步）
-│   ├── main.py                 # 主程序
-│   ├── config_manager.py       # ⚠️ 不应在此（已移到根目录）
-│   ├── logging_utils.py        # ⚠️ 不应在此（已移到根目录）
-│   │
-│   ├── neural_processing/      # 神经网络处理模块
-│   │   ├── neural_perception.py  # 神经感知主模块
-│   │   ├── flow_processor.py     # 光流处理器
-│   │   ├── depth_estimator.py    # 深度估计器
-│   │   ├── clustering.py         # 聚类模块
-│   │   └── __init__.py
-│   │
-│   ├── Visual_process/         # 视觉处理模块
-│   │   ├── visual_center.py     # 视觉处理中心
-│   │   ├── obstacle_detect.py   # 障碍物检测
-│   │   ├── pose_estimator.py    # 位姿估计
-│   │   ├── types.py             # 类型定义
-│   │   └── __init__.py
-│   │
-│   └── Drone_Interface/        # 无人机接口
-│       ├── Drone_Interface.py  # 无人机接口
-│       ├── rgb_data_extractor.py  # RGB数据提取器
-│       └── settings.json.txt    # AirSim配置（示例）
-│
-├── integration_system/         # ⚠️ 需要清理
-│   └── ...                     # 这个目录不再需要
-│
-├── docs/                       # 文档目录
-│   ├── PROJECT_STRUCTURE.md    # 本文件
-│   ├── ENV_SETUP.md            # 环境配置指南
-│   ├── MIGRATION.md            # 迁移指南
-│   ├── 项目可迁移性评估报告.md
-│   ├── 项目迁移结构优化方案.md
-│   └── 导入问题修复报告.md
-│
-├── venv/                       # 虚拟环境（不提交）
-├── sensor_data/                # 传感器数据（不提交）
-├── outputs/                    # 输出文件（不提交）
-├── logs/                       # 日志文件（不提交）
-└── .gitignore                  # Git忽略配置
+annual_project/
+├── src/                          # 源代码目录
+│   ├── main.py                   # 主程序入口
+│   ├── utils/                    # 工具模块（新增）
+│   │   ├── __init__.py
+│   │   ├── keyboard_control.py   # 键盘控制进程
+│   │   └── logging_utils.py      # 日志系统
+│   ├── Drone_Interface/          # 无人机接口模块
+│   │   ├── Drone_Interface.py
+│   │   └── rgb_data_extractor.py # RGB数据提取器
+│   ├── neural_processing/        # 神经网络处理模块
+│   │   ├── neural_perception.py  # 神经网络感知
+│   │   ├── depth_estimator.py    # 深度估计
+│   │   └── flow_processor.py     # 光流处理
+│   └── Visual_process/           # 视觉处理模块
+│       ├── visual_center.py      # 视觉处理中心
+│       ├── obstacle_detect.py    # 障碍物检测
+│       ├── pose_estimator.py     # 位姿估计
+│       └── types.py              # 数据类型定义
+├── models/                       # 模型目录
+│   ├── monodepth2/              # MonoDepth2深度估计模型
+│   └── RAFT/                    # RAFT光流模型
+├── integration_system/           # 集成系统
+├── docs/                         # 文档目录
+└── logs/                         # 日志目录（运行时生成）
 ```
 
-## 文件组织原则
+## 模块说明
 
-### 根目录文件
+### 1. src/main.py
+**功能**：主程序入口，多进程架构
+- 视觉处理进程（主进程）
+- 键盘控制进程（独立进程）
+- 通过Queue进行进程间通信
 
-**配置和工具模块：**
-- `config_manager.py` - 配置管理
-- `logging_utils.py` - 日志管理
-- `requirements.txt` - 依赖列表
-- `test_imports.py` - 导入测试
-- `setup.py` - 项目设置
-- `run_vision.bat` - 快速启动脚本
+**导入依赖**：
+```python
+from Drone_Interface.rgb_data_extractor import RGBDataExtractor, FrameBuffer
+from neural_processing.neural_perception import NeuralPerception
+from Visual_process.visual_center import VisualPerception
+from src.utils.logging_utils import get_logger
+from src.utils.keyboard_control import keyboard_control_process
+```
 
-**说明文档：**
-- `README.md` - 项目总览
-- `README_VISION.md` - 视觉处理说明
+### 2. src/utils/ (新增工具模块)
 
-### src/ 目录（源代码）
+#### 2.1 src/utils/__init__.py
+**功能**：工具包模块初始化
+- 导出 `get_logger` 和 `keyboard_control_process`
 
-**核心处理模块：**
-- `neural_processing/` - 神经网络处理
-- `Visual_process/` - 视觉处理
-- `Drone_Interface/` - 无人机接口
+#### 2.2 src/utils/logging_utils.py
+**功能**：统一的日志管理系统
+- 单例模式的日志管理器
+- 支持控制台和文件输出
+- 提供便捷的日志记录方法
 
-### models/ 目录（模型文件）
+#### 2.3 src/utils/keyboard_control.py
+**功能**：键盘控制进程
+- 独立监听键盘输入
+- 通过Queue发送命令给主进程
+- 支持多键同时按下
 
-**不提交到Git的大文件：**
-- 所有 `.pth`, `.npy`, `.pt` 文件
-- 所有模型压缩包
+### 3. src/Drone_Interface/
 
-### docs/ 目录（文档）
+#### 3.1 Drone_Interface.py
+无人机接口主模块
 
-**项目文档：**
-- 项目结构说明
-- 环境配置指南
-- 迁移指南
-- 技术评估报告
+#### 3.2 rgb_data_extractor.py
+**功能**：RGB数据提取器
+- 从AirSim捕获RGB图像
+- 帧缓冲区管理
+- 图像保存功能
 
-## 文件移动记录
+### 4. src/neural_processing/
 
-### 2026-02-15
+#### 4.1 neural_perception.py
+**功能**：神经网络感知模块
+- 集成深度估计和光流处理
+- 特征点提取
+- 图像分割
 
-**从 `src/` 移动到根目录：**
-- ✅ `config_manager.py`
-- ✅ `logging_utils.py`
+#### 4.2 depth_estimator.py
+**功能**：深度估计器
+- 使用MonoDepth2模型
+- 生成深度图
 
-**从根目录移动到 `docs/`：**
-- ✅ `项目可迁移性评估报告.md`
-- ✅ `项目迁移结构优化方案.md`
-- ✅ `导入问题修复报告.md`
+#### 4.3 flow_processor.py
+**功能**：光流处理器
+- 使用RAFT模型
+- 计算帧间光流
 
-**新增：**
-- ✅ `.gitignore` 更新（忽略模型文件）
+### 5. src/Visual_process/
 
-## Git管理策略
+#### 5.1 visual_center.py
+**功能**：视觉处理中心
+- 整合障碍物检测和位姿估计
+- 生成VisualState输出
 
-### 提交到Git的文件
+#### 5.2 obstacle_detect.py
+**功能**：障碍物检测
+- 极坐标映射
+- 历史数据融合
+- 生成障碍物极坐标帧
 
-**代码文件：**
-- `src/` 目录下所有Python文件
-- 根目录的 `requirements.txt`
-- 根目录的 `setup.py`
-- 根目录的 `test_imports.py`
-- 根目录的 `run_vision.bat`
-- 根目录的 `README.md`
-- 根目录的 `README_VISION.md`
-- 根目录的 `config_manager.py`
-- 根目录的 `logging_utils.py`
-- `.gitignore`
+#### 5.3 pose_estimator.py
+**功能**：位姿估计
+- 基于背景特征点的运动估计
+- 使用RANSAC进行鲁棒估计
 
-**文档文件：**
-- `docs/` 目录下所有文件
+#### 5.4 types.py
+**功能**：数据类型定义
+- VisualState
+- EgoMotion
+- ObstaclePolarFrame
+等数据结构
 
-**配置文件：**
-- `src/Drone_Interface/settings.json.txt`（作为示例配置）
+## 导入规则
 
-### 忽略的文件
+### 绝对导入优先
+为了与 `models/monodepth2/utils.py` 避免冲突，项目采用以下导入策略：
 
-**模型文件（网盘传输）：**
-- `models/RAFT/models/*.pth`
-- `models/RAFT/models/*.npy`
-- `models/monodepth2/mono+stereo_*/encoder.pth`
-- `models/monodepth2/mono+stereo_*/depth.pth`
-- `*.zip`, `*.tar.gz`, `*.rar`
+1. **main.py中的工具模块导入**：
+```python
+from src.utils.logging_utils import get_logger
+from src.utils.keyboard_control import keyboard_control_process
+```
 
-**临时文件：**
-- `venv/`
-- `sensor_data/`
-- `outputs/`
-- `logs/`
-- `visualizations/`
-- `__pycache__/`
-- `*.pyc`
-- `*.log`
-- `.DS_Store`
-- `Thumbs.db`
+2. **模块间的相对导入**：
+在src目录下的模块中，使用以下方式：
+```python
+from neural_processing.neural_perception import NeuralOutput
+from Visual_process.types import VisualState
+```
 
-## 使用流程
+3. **避免的导入方式**：
+```python
+# 不推荐（可能与models/monodepth2/utils.py冲突）
+from utils import get_logger
+```
 
-### 1. 获取项目文件
+### 相对导入问题
+Visual_process模块内部的相对导入（`from .obstacle_detect`）在某些测试环境下会失败，因此使用了try-except回退机制：
 
+```python
+try:
+    from .obstacle_detect import ObstacleProcessor
+    from .pose_estimator import BackgroundPoseEstimator
+    from .types import VisualState, EgoMotion, ObstaclePolarFrame
+except Exception:
+    # Fallback imports for local development
+    from Visual_process.obstacle_detect import ObstacleProcessor
+    from Visual_process.pose_estimator import BackgroundPoseEstimator
+    from Visual_process.types import VisualState, EgoMotion, ObstaclePolarFrame
+```
+
+## 多进程架构
+
+### 进程1：视觉处理进程
+- 捕获和处理帧
+- 通过Queue接收键盘命令
+- 显示图像和结果
+
+### 进程2：键盘控制进程
+- 独立监听键盘输入
+- 发送命令到Queue
+- 不阻塞主进程
+
+### 进程间通信
+使用 `multiprocessing.Queue` 和 `multiprocessing.Value` 进行通信：
+
+```python
+command_queue = Queue()  # 命令队列
+should_stop = Value('b', False)  # 共享停止标志
+```
+
+## 运行方式
+
+### 方式1：直接运行main.py
 ```bash
-# 网盘下载：models/ 目录
-# GitHub拉取：整个项目（不包括models）
-```
-
-### 2. 配置环境
-
-```bash
-# 创建虚拟环境
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# 安装基础依赖
-pip install -r requirements.txt
-
-# 根据电脑配置安装PyTorch
-# 详见 docs/ENV_SETUP.md
-```
-
-### 3. 配置AirSim
-
-```bash
-# 方式：手动配置
-# 打开AirSim -> 配置blocks
-```
-
-### 4. 验证安装
-
-```bash
-# 测试导入
-python test_imports.py
-
-# 运行主程序
+cd d:\bian_cheng\code\annual_project
 python src/main.py
 ```
 
-## 项目优势
+### 方式2：作为模块运行
+```bash
+cd d:\bian_cheng\code\annual_project
+python -m src.main
+```
 
-### ✅ 结构清晰
+## 键盘控制
 
-- 根目录：配置、工具、说明文档
-- src/：核心代码
-- models/：独立管理
-- docs/：完整文档
+- `w` - 前进
+- `s` - 后退
+- `a` - 左移
+- `d` - 右移
+- `,` - 上升
+- `.` - 下降
+- `e` - 捕获并处理两帧（间隔100ms）
+- `q` - 退出
 
-### ✅ Git友好
+## 日志系统
 
-- 大文件不提交
-- 小文件快速同步
-- 版本控制清晰
+日志文件存储在 `logs/` 目录下：
+- `logs/main.log` - 主程序日志
+- `logs/visual.log` - 视觉处理日志
 
-### ✅ 易于维护
+日志级别：DEBUG, INFO, WARNING, ERROR, CRITICAL
 
-- 配置文件独立
-- 文档集中管理
-- 代码模块化
+## 依赖关系图
 
-### ✅ 团队协作
+```
+main.py
+├── utils/logging_utils
+├── utils/keyboard_control
+├── Drone_Interface/rgb_data_extractor
+├── neural_processing/neural_perception
+│   ├── depth_estimator (models/monodepth2)
+│   └── flow_processor (models/RAFT)
+└── Visual_process/visual_center
+    ├── obstacle_detect
+    ├── pose_estimator
+    └── types
+```
 
-- 明确的文件组织
-- 统一的依赖管理
-- 清晰的文档指引
+## 注意事项
 
-## 常见问题
+1. **路径冲突**：`models/monodepth2/utils.py` 与 `src/utils/` 的命名冲突已解决，使用绝对导入 `from src.utils.xxx`。
 
-### Q: 为什么config_manager.py和logging_utils.py在根目录？
+2. **相对导入**：Visual_process模块内部使用相对导入，在测试时可能需要绝对导入的回退机制。
 
-A: 这两个是工具模块，不属于技术代码，更适合放在根目录作为全局配置和日志工具。
+3. **AirSim连接**：运行前需要确保AirSim已启动。
 
-### Q: 为什么models不提交到Git？
+4. **模型权重**：深度估计和光流模型需要预先下载权重文件。
 
-A: 模型文件很大（数百MB），提交到Git会导致：
-- 同步速度慢
-- 存储浪费
-- Git历史污染
+## 更新日志
 
-### Q: 如何保持模型同步？
-
-A: 使用网盘自动同步，或手动传输压缩包。
-
-
-### Q: docs/目录的作用？
-
-A: 集中存放所有文档，包括技术报告、配置指南、迁移文档等。
-
-## 下一步
-
-1. ✅ 完成文件移动
-2. ✅ 更新.gitignore
-3. ⏭️ 测试所有导入
-4. ⏭️ 创建环境配置文档（ENV_SETUP.md）
-5. ⏭️ 测试完整流程
+### 2026-02-22
+- 创建 `src/utils/` 工具模块
+- 移动 `keyboard_control.py` 到 `src/utils/`
+- 移动 `logging_utils.py` 到 `src/utils/`
+- 修复所有导入路径问题
+- 解决与 `models/monodepth2/utils.py` 的命名冲突
+- 通过Python语法检查
+- **修复Monodepth2导入冲突**：在 `depth_estimator.py` 中将 `models/monodepth2` 路径插入到 `sys.path` 最前面，确保优先级高于 `src/utils/`

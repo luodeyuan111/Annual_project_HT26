@@ -10,9 +10,9 @@ try:
     from .types import VisualState, EgoMotion, ObstaclePolarFrame
 except Exception:
     # Fallback imports for local development
-    from obstacle_detect import ObstacleProcessor
-    from pose_estimator import BackgroundPoseEstimator
-    from types import VisualState, EgoMotion, ObstaclePolarFrame
+    from Visual_process.obstacle_detect import ObstacleProcessor
+    from Visual_process.pose_estimator import BackgroundPoseEstimator
+    from Visual_process.types import VisualState, EgoMotion, ObstaclePolarFrame
 
 class VisualPerception:
     """
@@ -26,13 +26,22 @@ class VisualPerception:
         self.intrinsics = None
 
         # Obstacle processing (polar mapping + history fusion)
-        self.obstacle_processor = ObstacleProcessor()
+        self.obstacle_processor = ObstacleProcessor(
+            num_angles=config.get('num_angles', 360) if config else 360,
+            max_distance=config.get('max_distance', 10.0) if config else 10.0,
+            fov_horizontal=config.get('fov_horizontal', 90.0) if config else 90.0,
+            history_size=config.get('history_size', 5) if config else 5,
+            decay_factor=config.get('decay_factor', 0.7) if config else 0.7
+        )
 
         # Ego motion estimator (background pose)
         self.pose_estimator = BackgroundPoseEstimator()
 
         # Optional: allow external config to tweak behavior
         self.config = config or {}
+        
+        # 保存上一帧的ego_motion用于时空融合
+        self._prev_ego_motion = None
 
     def _load_intrinsics(self, intrinsics: Optional[Dict] = None) -> Dict:
         """

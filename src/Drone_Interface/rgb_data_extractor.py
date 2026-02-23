@@ -11,10 +11,33 @@ class RGBDataExtractor:
         self.drone_name = drone_name
         # 是否将每次捕获的图像保存到磁盘（连续实时显示时可设为False）
         self.save_images = save_images
-        self.client = airsim.MultirotorClient()  # 连接AirSim
-        self.client.confirmConnection()  # 确认连接
-        self.client.enableApiControl(True, vehicle_name=drone_name)  # 启用API控制
-        self.client.armDisarm(True, vehicle_name=drone_name)  # 解锁无人机
+        
+        print(f"[RGBDataExtractor] 正在初始化AirSim客户端...")
+        try:
+            # 创建AirSim客户端，设置较短的超时时间
+            self.client = airsim.MultirotorClient(timeout_value=3)
+            print(f"[RGBDataExtractor] AirSim客户端创建成功")
+        except Exception as e:
+            print(f"[RGBDataExtractor] 创建AirSim客户端失败: {e}")
+            raise
+        
+        # 注意：不使用confirmConnection()，它可能调用不存在的simGetConnectionState()
+        
+        # 尝试启用API控制（可能失败，但继续运行）
+        try:
+            self.client.enableApiControl(True, vehicle_name=drone_name)
+            print(f"[RGBDataExtractor] API控制已启用")
+        except Exception as e:
+            print(f"[RGBDataExtractor] 启用API控制失败: {e}")
+            print(f"[RGBDataExtractor] 继续运行，但可能无法控制无人机")
+        
+        # 尝试解锁无人机（可能失败）
+        try:
+            self.client.armDisarm(True, vehicle_name=drone_name)
+            print(f"[RGBDataExtractor] 无人机已解锁")
+        except Exception as e:
+            print(f"[RGBDataExtractor] 解锁无人机失败: {e}")
+            print(f"[RGBDataExtractor] 继续运行，但可能无法捕获图像")
 
         # 相机名称列表（需与settings.json中的配置一致）
         self.camera_names = ["front_camera", "right_camera", "back_camera", "left_camera"]

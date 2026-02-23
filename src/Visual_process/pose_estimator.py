@@ -6,7 +6,7 @@ from typing import Dict, Optional, Tuple
 import numpy as np
 import cv2
 
-from .types import EgoMotion, Array
+from Visual_process.types import EgoMotion, Array
 
 # Try to import any torch dependencies, but we don't need them for pose_estimator
 # This file uses cv2 and numpy only, so it should work without torch
@@ -15,13 +15,14 @@ from .types import EgoMotion, Array
 @dataclass
 class PoseEstimatorConfig:
     background_label: int = 0
-    ransac_thresh: float = 1.0
-    min_points: int = 30
+    ransac_thresh: float = 0.5  # 降低阈值提高鲁棒性
+    min_points: int = 15  # 降低最小点数要求
     depth_min: float = 0.3
     depth_max: float = 80.0
     focal_length_px: float = 320.0
     principal_point: Tuple[float, float] = (320.0, 240.0)
     smooth_velocity: float = 0.6
+    min_inlier_ratio: float = 0.3  # 最小内点比例
 
 
 class BackgroundPoseEstimator:
@@ -34,6 +35,7 @@ class BackgroundPoseEstimator:
                 setattr(cfg, k, v)
         self.config = cfg
         self.prev_translation = np.zeros(3, dtype=np.float32)
+        self.prev_velocity = np.zeros(3, dtype=np.float32)
         self.prev_timestamp = None
 
     def _filter_background(
@@ -122,7 +124,10 @@ class BackgroundPoseEstimator:
         _, R, t, mask_pose = cv2.recoverPose(E, pts0, pts1, cam_matrix)
         inlier_mask = mask_pose.astype(bool).ravel()
         n_inliers = int(inlier_mask.sum())
-        if n_inliers < self.config.min_points:
+        
+        # 计算内点比例，检查是否满足最小要求
+        inlier_ratio = n_inliers / max(len(pts0), 1)
+        if n_inliers < self.config.min_points or inlier_ratio < self.config.min_inlier_ratio:
             return EgoMotion.identity()
 
         translation = t[:, 0].astype(np.float32)
@@ -150,19 +155,20 @@ class BackgroundPoseEstimator:
             velocity: Smoothed velocity vector
         """
         if self.prev_timestamp is None or timestamp <= self.prev_timestamp:
-            self.prev_translation = translation
+            self.prev_translation = translation.copy()
             self.prev_timestamp = timestamp
             return np.zeros(3, dtype=np.float32)
 
         dt = max(timestamp - self.prev_timestamp, 1e-3)
-        velocity = (translation - self.prev_translation) / dt
+        raw_velocity = (translation - self.prev_translation) / dt
 
         # Exponential smoothing
-        velocity = (
-            self.config.smooth_velocity * self.prev_translation
-            + (1.0 - self.config.smooth_velocity) * velocity
+        smoothed_velocity = (
+            self.config.smooth_velocity * self.prev_velocity
+            + (1.0 - self.config.smooth_velocity) * raw_velocity
         )
 
-        self.prev_translation = translation
+        self.prev_velocity = smoothed_velocity.copy()
+        self.prev_translation = translation.copy()
         self.prev_timestamp = timestamp
-        return velocity.astype(np.float32)
+        return smoothed_velocity.astype(np.float32)

@@ -79,54 +79,77 @@ class ObstacleProcessor:
 
     def _extract_from_depth(self, neural_output: NeuralOutput, intrinsics: Dict) -> np.ndarray:
         """
-        Extract obstacle distribution from depth map.
+        Extract obstacle distribution from depth map using horizontal slice method.
+        
+        Reference: 
+        - Take minimum depth value per column in middle region of depth map
+        - Convert pixel coordinates to angles using camera intrinsics
+        - Map to polar coordinate vector
 
         Args:
             neural_output: NeuralOutput containing depth_t
-            intrinsics: Camera intrinsics {'fx', 'cx'}
+            intrinsics: Camera intrinsics {'fx', 'fy', 'cx', 'cy'}
 
         Returns:
             distances: Polar distance array [num_angles]
         """
-        # 初始化为无穷大
         distances = np.full(self.num_angles, np.inf)
 
-        # 检查深度图有效性
         depth_image = neural_output.depth_maps.get('depth_t')
         if depth_image is None or neural_output.quality_metrics.get('overall_confidence', 0) < 0.1:
-            return distances  # 返回全无穷大的空帧
+            return distances
 
         height, width = depth_image.shape
-        fx = intrinsics['fx']
-        cx = intrinsics['cx']
+        fx = intrinsics.get('fx', 320.0)
+        fy = intrinsics.get('fy', 320.0)
+        cx = intrinsics.get('cx', width / 2.0)
+        cy = intrinsics.get('cy', height / 2.0)
 
-        # 参考用户提供的逻辑：取中间多行进行鲁棒采样
-        # 增加垂直采样覆盖，防止无人机俯仰时丢失障碍物
-        scan_rows = np.linspace(height * 0.35, height * 0.65, 7).astype(int)
-
+        # 文献方法：取深度图中间区域的水平切片
+        # 取中间多行（垂直方向）来增加鲁棒性
+        scan_rows = np.linspace(height * 0.3, height * 0.7, 5).astype(int)
+        
+        # 对每一列取最小深度值（水平切片）
+        min_depth_per_col = np.min(depth_image[scan_rows, :], axis=0)
+        
+        # 添加深度裁剪：过滤掉不合理的深度值（如天空的极大值）
+        # Monodepth2对合成图像（天空/地面）估计可能出错
+        depth_clipped = np.clip(min_depth_per_col, 0.1, self.max_distance)
+        
+        for u in range(0, width, 1):
+            depth = depth_clipped[u]
+            
+            # 只处理有效深度（0.1米到max_distance之间）
+            if 0.1 <= depth < self.max_distance:
+                # 计算相对于光心的角度（弧度）
+                # u是列索引，cx是光心x坐标
+                angle_rad = np.arctan2(u - cx, fx)
+                
+                # 将角度从[-π, π]映射到[0, num_angles-1]
+                # angles数组是linspace(-π, π, num_angles)
+                # 所以需要：angle_rad -> index
+                angle_normalized = (angle_rad + np.pi) / (2 * np.pi)
+                idx = int(angle_normalized * (self.num_angles - 1))
+                idx = np.clip(idx, 0, self.num_angles - 1)
+                
+                if depth < distances[idx]:
+                    distances[idx] = depth
+        
+        # 补充：使用多行采样填充稀疏区域
         for v in scan_rows:
-            for u in range(0, width, 2):  # 步长为2，加速计算
+            for u in range(0, width, 2):
                 depth = depth_image[v, u]
-
-                if 0 < depth <= self.max_distance:
-                    # 计算相对于相机光轴的角度 (弧度)
-                    angle_rad = np.arctan((u - cx) / fx)
-                    angle_deg = np.degrees(angle_rad)
-
-                    # 修正角度映射：将 FOV 范围 (-fov/2 ~ fov/2) 映射到数组索引
-                    # 假设 num_angles=360, fov=90, 则 -45~45 度映射到 90~270 索引 (前方180度)
-                    fov_half = self.fov_horizontal / 2.0
-                    if -fov_half <= angle_deg <= fov_half:
-                        # 归一化到 [0, 1] 范围
-                        normalized_angle = (angle_deg + fov_half) / self.fov_horizontal
-                        # 映射到数组索引 (前方扇区)
-                        front_sector_start = (self.num_angles - int(self.num_angles * self.fov_horizontal / 360.0)) // 2
-                        front_sector_size = int(self.num_angles * self.fov_horizontal / 360.0)
-                        final_idx = front_sector_start + int(normalized_angle * front_sector_size)
-                        final_idx = np.clip(final_idx, 0, self.num_angles - 1)
-
-                        if depth < distances[final_idx]:
-                            distances[final_idx] = depth
+                
+                # 添加深度裁剪
+                if 0.1 <= depth < self.max_distance:
+                    angle_rad = np.arctan2(u - cx, fx)
+                    
+                    angle_normalized = (angle_rad + np.pi) / (2 * np.pi)
+                    idx = int(angle_normalized * (self.num_angles - 1))
+                    idx = np.clip(idx, 0, self.num_angles - 1)
+                    
+                    if depth < distances[idx]:
+                        distances[idx] = depth
 
         return distances
 
