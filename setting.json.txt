@@ -1,0 +1,103 @@
+{
+  "SeeDocsAt": "https://github.com/microsoft/AirSim/blob/master/docs/settings.md",
+  "SettingsVersion": 1.2,
+  "SimMode": "Multirotor",
+  "Vehicles": {
+    "Drone1": {
+      "VehicleType": "SimpleFlight",
+      "X": 0, "Y": 0, "Z": 0,  // 初始位置，可根据需要调整
+      "Cameras": {
+        "front": {
+          "CaptureSettings": [
+            {
+              "ImageType": 0,  // 基础场景图，深度图通过API指定
+              "Width": 640,
+              "Height": 480,
+              "FOV_Degrees": 90
+            }
+          ],
+          "X": 0.5, "Y": 0.0, "Z": -0.2,  // 偏移避免机体遮挡
+          "Pitch": 0, "Roll": 0, "Yaw": 0
+        },
+        "right": {
+          "CaptureSettings": [
+            {
+              "ImageType": 0,
+              "Width": 640,
+              "Height": 480,
+              "FOV_Degrees": 90
+            }
+          ],
+          "X": 0.0, "Y": 0.5, "Z": -0.2,
+          "Pitch": 0, "Roll": 0, "Yaw": 90
+        },
+        "back": {
+          "CaptureSettings": [
+            {
+              "ImageType": 0,
+              "Width": 640,
+              "Height": 480,
+              "FOV_Degrees": 90
+            }
+          ],
+          "X": -0.5, "Y": 0.0, "Z": -0.2,
+          "Pitch": 0, "Roll": 0, "Yaw": 180
+        },
+        "left": {
+          "CaptureSettings": [
+            {
+              "ImageType": 0,
+              "Width": 640,
+              "Height": 480,
+              "FOV_Degrees": 90
+            }
+          ],
+          "X": 0.0, "Y": -0.5, "Z": -0.2,
+          "Pitch": 0, "Roll": 0, "Yaw": -90
+        }
+      }
+    },
+    "Drone2": {
+      "VehicleType": "SimpleFlight",
+      "X": 5, "Y": 0, "Z": 0,  // 与Drone1间隔5米
+      "Cameras": {
+        // 传感器配置与Drone1相同
+        "front": {"X": 0.5, "Y": 0.0, "Z": -0.2, "Pitch": 0, "Roll": 0, "Yaw": 0},
+        "right": {"X": 0.0, "Y": 0.5, "Z": -0.2, "Pitch": 0, "Roll": 0, "Yaw": 90},
+        "back": {"X": -0.5, "Y": 0.0, "Z": -0.2, "Pitch": 0, "Roll": 0, "Yaw": 180},
+        "left": {"X": 0.0, "Y": -0.5, "Z": -0.2, "Pitch": 0, "Roll": 0, "Yaw": -90}
+      }
+    },
+    "Drone3": {
+      "VehicleType": "SimpleFlight",
+      "X": 10, "Y": 0, "Z": 0,
+      "Cameras": {
+        // 配置同Drone1
+        "front": {"X": 0.5, "Y": 0.0, "Z": -0.2, "Pitch": 0, "Roll": 0, "Yaw": 0},
+        "right": {"X": 0.0, "Y": 0.5, "Z": -0.2, "Pitch": 0, "Roll": 0, "Yaw": 90},
+        "back": {"X": -0.5, "Y": 0.0, "Z": -0.2, "Pitch": 0, "Roll": 0, "Yaw": 180},
+        "left": {"X": 0.0, "Y": -0.5, "Z": -0.2, "Pitch": 0, "Roll": 0, "Yaw": -90}
+      }
+    },
+    "Drone4": {
+      "VehicleType": "SimpleFlight",
+      "X": 15, "Y": 0, "Z": 0,
+      "Cameras": {
+        "front": {"X": 0.5, "Y": 0.0, "Z": -0.2, "Pitch": 0, "Roll": 0, "Yaw": 0},
+        "right": {"X": 0.0, "Y": 0.5, "Z": -0.2, "Pitch": 0, "Roll": 0, "Yaw": 90},
+        "back": {"X": -0.5, "Y": 0.0, "Z": -0.2, "Pitch": 0, "Roll": 0, "Yaw": 180},
+        "left": {"X": 0.0, "Y": -0.5, "Z": -0.2, "Pitch": 0, "Roll": 0, "Yaw": -90}
+      }
+    },
+    "Drone5": {
+      "VehicleType": "SimpleFlight",
+      "X": 20, "Y": 0, "Z": 0,
+      "Cameras": {
+        "front": {"X": 0.5, "Y": 0.0, "Z": -0.2, "Pitch": 0, "Roll": 0, "Yaw": 0},
+        "right": {"X": 0.0, "Y": 0.5, "Z": -0.2, "Pitch": 0, "Roll": 0, "Yaw": 90},
+        "back": {"X": -0.5, "Y": 0.0, "Z": -0.2, "Pitch": 0, "Roll": 0, "Yaw": 180},
+        "left": {"X": 0.0, "Y": -0.5, "Z": -0.2, "Pitch": 0, "Roll": 0, "Yaw": -90}
+      }
+    }
+  }
+}
