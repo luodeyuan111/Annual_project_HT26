@@ -9,7 +9,7 @@
 | 项目 | 内容 |
 |-----|------|
 | **创建时间** | 2026-02-15 |
-| **最后更新** | 2026-02-15 |
+| **最后更新** | 2026-02-25 |
 | **项目名称** | Annual Project - 无人机视觉感知系统 |
 | **项目路径** | `d:\bian_cheng\code\annual_project` |
 | **主要技术栈** | Python, PyTorch, OpenCV, AirSim, RAFT, MonoDepth2 |
@@ -1058,10 +1058,94 @@ if not log_to_file:
 - 流程1：AirSim直接数据用于集群控制演示
 - 流程2：神经网络处理用于效果对比和流程验证
 
+### 2026-02-24 - v1.2 运动控制与API方案
+
+**主要更新内容：**
+
+1. **改进运动控制（持续速度模式）**
+   - 文件：`src/utils/keyboard_control.py`, `src/main.py`
+   - 问题：原方案按下移动、松开停止，但AirSim API需要持续发送指令
+   - 改进：
+     - Toggle模式：第一次按键开始运动，再次按键停止
+     - 使用共享内存 `velocity_state` 追踪速度状态
+     - 主循环每帧检查速度变化并持续发送 `moveByVelocityBodyFrameAsync`
+   - 效果：运动与拍摄可同时进行，两帧间有真实运动
+
+2. **创建多摄像头整合类**
+   - 文件：`src/Visual_process/multi_camera_fusion.py`（新增）
+   - 功能：
+     - `CameraConfig` 类配置摄像头参数（名称、FOV、角度偏移）
+     - `MultiCameraFusion` 类融合多摄像头障碍物信息
+     - 支持4摄像头方案（前/后/左/右）
+   - 接口：输入多个 `ObstaclePolarFrame`，输出融合后的360° `ObstaclePolarFrame`
+
+3. **创建AirSim API方案**
+   - 文件：`src/alternative_pipeline/`（新增文件夹）
+   - `api_data_extractor.py`:
+     - `AirSimDataExtractor`: 单摄像头数据获取
+     - `MultiCameraAirSimExtractor`: 多摄像头数据获取
+     - 获取深度图、RGB图、位姿、速度
+   - `api_visual_adapter.py`:
+     - `AirSimVisualAdapter`: 将API数据转换为VisualState
+     - `MultiCameraAirSimAdapter`: 多摄像头数据适配
+     - 复用现有的 `ObstacleDetector` 处理深度图
+   - `main_api.py`: API方案主程序入口
+
+4. **中期答辩准备（双流程架构）**
+   ```
+   ┌─────────────────────────────────────────────────────────┐
+   │                    双流程架构                            │
+   ├──────────────────────────┬──────────────────────────────────┤
+   │    流程1: 集群控制        │    流程2: 视觉验证                │
+   │    (AirSim API)          │    (神经网络+OpenCV)              │
+   ├──────────────────────────┼──────────────────────────────────┤
+   │  alternative_pipeline/   │  main.py                         │
+   │  • 真实深度              │  • MonoDepth2深度估计            │
+   │  • 真实位姿              │  • RAFT光流估计                  │
+   │  • 多摄像头支持          │  • 图像处理                      │
+   └──────────────────────────┴──────────────────────────────────┘
+   ```
+
+**文件变更清单：**
+
+- 修改：`src/utils/keyboard_control.py`
+- 修改：`src/main.py`
+- 新增：`src/Visual_process/multi_camera_fusion.py`
+- 新增：`src/alternative_pipeline/api_data_extractor.py`
+- 新增：`src/alternative_pipeline/api_visual_adapter.py`
+- 新增：`src/alternative_pipeline/main_api.py`
+
+### 2026-02-25 - v1.2.1 障碍物检测修复
+
+**主要更新内容：**
+
+1. **修复障碍物检测问题**
+   - 文件：`src/alternative_pipeline/api_visual_adapter.py`
+   - 问题：原方案取全列最小值会检测到地面，且将天空识别为很近的障碍物
+   - 改进：
+     - 扫描行从 20%-80%（10行）改为 45%-55%（3行）
+     - 只检测无人机安全飞行高度范围内的障碍物
+     - 使用95百分位动态确定"远边界"
+     - 障碍物阈值设为远边界的80%
+
+2. **可视化优化**
+   - 文件：`src/utils/visualization.py`
+   - 改进：
+     - 有效障碍物半径放大1.5倍
+     - 移除角度偏移（ANGLE_OFFSET=0）
+     - 绿点阈值调整到95%最大距离
+
+**文件变更清单：**
+- 修改：`src/alternative_pipeline/api_visual_adapter.py`
+- 修改：`src/utils/visualization.py`
+
 ### 后续更新计划
 
-- [ ] 实现AirSim直接数据获取（用于集群控制）
-- [ ] 添加数据源切换功能（AirSim API vs 神经网络）
+- [x] 实现AirSim直接数据获取（用于集群控制）
+- [x] 多摄像头整合
+- [x] 持续速度控制模式
+- [x] 障碍物检测优化
+- [ ] 多无人机支持（等待AirSim setting配置）
 - [ ] 集群控制集成测试
 - [ ] 准备中期答辩材料
 
@@ -1076,6 +1160,6 @@ if not log_to_file:
 
 ---
 
-**文档版本**：v1.1  
-**最后更新**：2026-02-23  
-**下次更新**：实现AirSim直接数据获取功能
+**文档版本**：v1.2.1  
+**最后更新**：2026-02-25  
+**下次更新**：多无人机支持

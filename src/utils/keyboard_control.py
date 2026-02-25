@@ -14,7 +14,7 @@ from datetime import datetime
 current_dir = os.path.dirname(os.path.abspath(__file__))
 project_root = os.path.dirname(os.path.dirname(current_dir))  # utils/src/project_root
 
-def keyboard_control_process(command_queue, logger, should_stop):
+def keyboard_control_process(command_queue, logger, should_stop, velocity_state):
     """
     键盘控制进程
     
@@ -22,11 +22,14 @@ def keyboard_control_process(command_queue, logger, should_stop):
     - 持续监听键盘输入
     - 通过Queue发送按键命令给主进程
     - 支持多键同时按下
+    - 支持持续运动模式（按下移动，持续运动；松开停止）
+    - 使用共享内存追踪按键状态
     
     Args:
         command_queue: 进程间通信队列
         logger: 日志记录器
         should_stop: 共享停止标志
+        velocity_state: 共享速度状态 [vx, vy, vz, active]
     """
     try:
         logger.info("=" * 60)
@@ -35,18 +38,30 @@ def keyboard_control_process(command_queue, logger, should_stop):
         logger.info("开始监听键盘输入...")
         logger.info("=" * 60)
         
-        # 键盘命令映射
-        key_commands = {
-            ord('w'): {'action': 'move', 'direction': '前进', 'dx': 10, 'dy': 0, 'dz': 0},
-            ord('s'): {'action': 'move', 'direction': '后退', 'dx': -10, 'dy': 0, 'dz': 0},
-            ord('a'): {'action': 'move', 'direction': '左移', 'dx': 0, 'dy': -10, 'dz': 0},
-            ord('d'): {'action': 'move', 'direction': '右移', 'dx': 0, 'dy': 10, 'dz': 0},
-            ord(','): {'action': 'move', 'direction': '上升', 'dx': 0, 'dy': 0, 'dz': -10},
-            ord('.'): {'action': 'move', 'direction': '下降', 'dx': 0, 'dy': 0, 'dz': 10},
-            ord('e'): {'action': 'process', 'direction': '处理两帧'},
-            ord('v'): {'action': 'visualize', 'direction': '切换可视化'},
-            ord('q'): {'action': 'quit', 'direction': '退出'},
+        # 速度设置
+        MOVE_SPEED = 10  # 米/秒
+        
+        # 移动命令 - 按下启动，松开停止
+        # 使用小写字母的ASCII码
+        move_keys = {
+            119: {'axis': 0, 'value': MOVE_SPEED, 'key': 'w'},   # w 前进
+            115: {'axis': 0, 'value': -MOVE_SPEED, 'key': 's'},  # s 后退
+            97:  {'axis': 1, 'value': -MOVE_SPEED, 'key': 'a'},  # a 左移
+            100: {'axis': 1, 'value': MOVE_SPEED, 'key': 'd'},   # d 右移
+            44:  {'axis': 2, 'value': -MOVE_SPEED, 'key': ','},  # , 上升
+            46:  {'axis': 2, 'value': MOVE_SPEED, 'key': '.'},   # . 下降
         }
+        
+        # 特殊命令
+        special_commands = {
+            101: {'action': 'process', 'key': 'e'},   # e
+            118: {'action': 'visualize', 'key': 'v'}, # v
+            113: {'action': 'quit', 'key': 'q'},      # q
+            32:  {'action': 'stop_all', 'key': 'space'},  # 空格
+        }
+        
+        # 按键状态追踪
+        key_active = {k: False for k in move_keys.keys()}
         
         # 等待队列初始化完成
         time.sleep(0.1)
@@ -56,44 +71,97 @@ def keyboard_control_process(command_queue, logger, should_stop):
             try:
                 # 检查是否有按键（立即返回，不阻塞）
                 if msvcrt.kbhit():
-                    # 读取所有可用的按键
-                    keys = []
-                    while msvcrt.kbhit():
-                        try:
-                            key = ord(msvcrt.getch())
-                            keys.append(key)
-                        except:
-                            break
+                    # 读取按键
+                    try:
+                        ch = msvcrt.getch()
+                    except:
+                        continue
                     
-                    # 处理所有按键
-                    for key in keys:
-                        if key in key_commands:
-                            cmd = key_commands[key]
-                            action = cmd['action']
-                            
-                            if action == 'move':
-                                logger.info(f"按键检测: {cmd['direction']}")
-                                logger.debug(f"移动指令: dx={cmd['dx']}, dy={cmd['dy']}, dz={cmd['dz']}")
-                                command_queue.put(('move', cmd))
-                            elif action == 'process':
-                                logger.info("按键检测: 处理两帧 (e)")
-                                command_queue.put(('process', None))
-                            elif action == 'visualize':
-                                logger.info("按键检测: 切换可视化 (v)")
-                                command_queue.put(('visualize', None))
-                            elif action == 'quit':
-                                logger.info("按键检测: 退出 (q)")
-                                command_queue.put(('quit', None))
-                                should_stop.value = True
-                                break
+                    # 处理扩展键（方向键等）
+                    if ch in (b'\xe0', b'\x00'):
+                        try:
+                            _ = msvcrt.getch()
+                        except:
+                            pass
+                        continue
+                    
+                    # 获取键值
+                    key = ord(ch)
+                    
+                    # 处理移动按键
+                    if key in move_keys:
+                        cmd = move_keys[key]
+                        axis = cmd['axis']
+                        value = cmd['value']
                         
-                        # 调试信息（只记录一次）
-                        if key not in key_commands and not hasattr(keyboard_control_process, '_debug_printed'):
-                            logger.debug(f"未定义按键: ASCII={key}, 字符={chr(key)}")
-                            keyboard_control_process._debug_printed = True
+                        # 切换该轴的速度方向
+                        current_axis_value = 0
+                        for k, v in move_keys.items():
+                            if v['axis'] == axis and key_active.get(k, False):
+                                current_axis_value = v['value']
+                        
+                        if current_axis_value == value:
+                            key_active[key] = False
+                            logger.info(f"停止运动: axis={axis}")
+                        else:
+                            for k, v in move_keys.items():
+                                if v['axis'] == axis:
+                                    key_active[k] = (k == key)
+                            logger.info(f"开始运动: axis={axis}, value={value}")
+                        
+                        velocity_state[3] = 1 if any(key_active.values()) else 0
+                        
+                    # 处理特殊命令
+                    elif key in special_commands:
+                        cmd = special_commands[key]
+                        action = cmd['action']
+                        
+                        if action == 'stop_all':
+                            key_active = {k: False for k in move_keys.keys()}
+                            velocity_state[0] = 0
+                            velocity_state[1] = 0
+                            velocity_state[2] = 0
+                            velocity_state[3] = 0
+                            logger.info("停止所有运动 (空格)")
+                            
+                        elif action == 'process':
+                            logger.info("按键检测: 处理两帧 (e)")
+                            command_queue.put(('process', None))
+                        elif action == 'visualize':
+                            logger.info("按键检测: 切换可视化 (v)")
+                            command_queue.put(('visualize', None))
+                        elif action == 'quit':
+                            logger.info("按键检测: 退出 (q)")
+                            command_queue.put(('quit', None))
+                            should_stop.value = True
+                            break
+                        
+                        # 调试信息
+                        if key not in move_keys and key not in special_commands:
+                            logger.debug(f"未定义按键: ASCII={key}")
+                
+                # 更新速度状态（基于按键状态）
+                # axis 0: x (前进/后退), axis 1: y (左/右), axis 2: z (上升/下降)
+                vx, vy, vz = 0.0, 0.0, 0.0
+                
+                for key, cmd in move_keys.items():
+                    if key_active.get(key, False):
+                        axis = cmd['axis']
+                        value = cmd['value']
+                        if axis == 0:
+                            vx = value
+                        elif axis == 1:
+                            vy = value
+                        elif axis == 2:
+                            vz = value
+                
+                # 更新共享内存中的速度
+                velocity_state[0] = vx
+                velocity_state[1] = vy
+                velocity_state[2] = vz
                 
                 # 短暂休眠，降低CPU占用
-                time.sleep(0.001)  # 1ms检查一次
+                time.sleep(0.01)  # 10ms更新一次速度
                 
             except KeyboardInterrupt:
                 logger.info("键盘控制进程收到中断信号")

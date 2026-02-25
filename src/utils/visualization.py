@@ -156,43 +156,72 @@ class Visualizer:
             y = int(center[1] + radius * np.sin(angle_rad))
             cv2.line(radar, center, (x, y), (80, 80, 80), 1)
         
-        # 绘制障碍物点
-        # angles是[-π, π]，0度是正前方（图像中心）
-        # 雷达图：0度朝上，顺时针增加
+        # 绘制障碍物轮廓线（无角度偏移）
+        ANGLE_OFFSET = 0
+        
+        # 先计算所有点的坐标
+        points = []
         for i, (angle, depth) in enumerate(zip(angles, depths)):
             if np.isfinite(depth) and depth > 0.1 and depth <= max_distance:
-                # 转换角度：angles[-π, π] -> 雷达图角度
-                # -π (最左) -> -90度 (雷达图左边)
-                # 0 (中心) -> 0度 (雷达图上方)
-                # π (最右) -> 90度 (雷达图右边)
-                # 雷达图：0度朝上，顺时针为正
-                radar_angle = -angle  # 反转，因为图像x向右为正，雷达顺时针为正
+                angle_deg = np.degrees(angle)
+                
+                # 添加角度偏移并反转
+                radar_angle_deg = -angle_deg + ANGLE_OFFSET
+                
+                # 归一化到[-180, 180]
+                while radar_angle_deg > 180:
+                    radar_angle_deg -= 360
+                while radar_angle_deg < -180:
+                    radar_angle_deg += 360
+                
+                radar_angle_rad = np.radians(radar_angle_deg)
                 
                 # 距离归一化
                 dist_ratio = depth / max_distance
                 dist_ratio = min(dist_ratio, 1.0)
                 
-                # 计算像素位置
-                px = int(center[0] + radius * dist_ratio * np.sin(radar_angle))
-                py = int(center[1] - radius * dist_ratio * np.cos(radar_angle))
+                # 有效障碍物的半径放大1.5倍
+                if depth < max_distance * 0.95:
+                    dist_ratio = min(dist_ratio * 1.5, 1.0)
                 
-                # 确保在图像范围内
+                # 计算像素位置
+                px = int(center[0] + radius * dist_ratio * np.sin(radar_angle_rad))
+                py = int(center[1] - radius * dist_ratio * np.cos(radar_angle_rad))
+                
                 if 0 <= px < size and 0 <= py < size:
-                    # 颜色基于距离：近=红色，远=蓝色
-                    color_ratio = dist_ratio
-                    color = (
-                        int(255 * (1 - color_ratio)),  # R: 近=255, 远=0
-                        int(50),                        # G
-                        int(255 * color_ratio)          # B: 近=0, 远=255
-                    )
-                    cv2.circle(radar, (px, py), 2, color, -1)
+                    points.append((px, py, depth))
         
-        # 绘制最近障碍物方向
+        # 画点（增加大小）
+        # 使用动态阈值判断是否有障碍物
+        no_obstacle_threshold = max_distance * 0.95  # 接近最大距离时视为无障碍
+        for px, py, depth in points:
+            if depth >= no_obstacle_threshold:
+                color = (0, 255, 0)  # 绿色表示无障碍
+            else:
+                color_ratio = min(depth / (max_distance * 0.7), 1.0)  # 归一化到70%最大距离作为"最近"
+                color = (
+                    int(255 * color_ratio),
+                    int(50),
+                    int(255 * (1 - color_ratio))
+                )
+            cv2.circle(radar, (px, py), 3, color, -1)
+        
+        # 画线连接相邻点形成轮廓
+        if len(points) > 1:
+            for i in range(len(points) - 1):
+                cv2.line(radar, (points[i][0], points[i][1]), 
+                        (points[i+1][0], points[i+1][1]), (100, 100, 100), 1)
+        
+        # 绘制最近障碍物方向（应用角度偏移）
         if obstacle_frame.closest_depth < max_distance and obstacle_frame.closest_depth > 0.1:
-            # 转换角度到雷达图坐标
-            closest_angle_rad = np.radians(obstacle_frame.closest_angle)
-            cx = int(center[0] + radius * 0.8 * np.sin(-closest_angle_rad))
-            cy = int(center[1] - radius * 0.8 * np.cos(-closest_angle_rad))
+            closest_angle_deg = -obstacle_frame.closest_angle + ANGLE_OFFSET
+            while closest_angle_deg > 180:
+                closest_angle_deg -= 360
+            while closest_angle_deg < -180:
+                closest_angle_deg += 360
+            closest_angle_rad = np.radians(closest_angle_deg)
+            cx = int(center[0] + radius * 0.8 * np.sin(closest_angle_rad))
+            cy = int(center[1] - radius * 0.8 * np.cos(closest_angle_rad))
             cv2.arrowedLine(radar, center, (cx, cy), (0, 0, 255), 2)
         
         # 添加文字标注（使用英文避免乱码）

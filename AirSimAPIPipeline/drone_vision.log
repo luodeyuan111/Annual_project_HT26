@@ -1,0 +1,246 @@
+2026-02-24 13:29:11 - DroneVision - INFO - ==================================================
+2026-02-24 13:29:11 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 13:29:11 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 13:29:11 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 13:29:11 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 13:29:11 - DroneVision - INFO - ==================================================
+2026-02-24 13:29:11 - DroneVision - INFO - 连接AirSim...
+2026-02-24 13:29:11 - DroneVision - INFO - 捕获并处理单帧...
+2026-02-24 13:31:08 - DroneVision - INFO - ==================================================
+2026-02-24 13:31:08 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 13:31:08 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 13:31:08 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 13:31:08 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 13:31:08 - DroneVision - INFO - ==================================================
+2026-02-24 13:31:08 - DroneVision - INFO - 连接AirSim...
+2026-02-24 13:31:08 - DroneVision - INFO - 捕获并处理单帧...
+2026-02-24 13:40:44 - DroneVision - INFO - ==================================================
+2026-02-24 13:40:44 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 13:40:44 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 13:40:44 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 13:40:44 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 13:40:44 - DroneVision - INFO - ==================================================
+2026-02-24 13:40:44 - DroneVision - INFO - 连接AirSim...
+2026-02-24 13:40:44 - DroneVision - INFO - 捕获并处理单帧...
+2026-02-24 13:40:44 - DroneVision - INFO - ========================================
+2026-02-24 13:40:44 - DroneVision - INFO - Frame 0
+2026-02-24 13:40:44 - DroneVision - INFO - Position: [-27.18565941  -4.21593523   0.62797302]
+2026-02-24 13:40:44 - DroneVision - INFO - Obstacle: closest=1.10m @ -50.0deg
+2026-02-24 13:41:25 - DroneVision - INFO - ==================================================
+2026-02-24 13:41:25 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 13:41:25 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 13:41:25 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 13:41:25 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 13:41:25 - DroneVision - INFO - ==================================================
+2026-02-24 13:41:25 - DroneVision - INFO - 连接AirSim...
+2026-02-24 13:41:25 - DroneVision - INFO - 捕获并处理单帧...
+2026-02-24 13:41:25 - DroneVision - INFO - ========================================
+2026-02-24 13:41:25 - DroneVision - INFO - Frame 0
+2026-02-24 13:41:25 - DroneVision - INFO - Position: [-27.18565941  -4.21593523   0.62797302]
+2026-02-24 13:41:25 - DroneVision - INFO - Obstacle: closest=1.10m @ -50.0deg
+2026-02-24 13:45:45 - DroneVision - INFO - ==================================================
+2026-02-24 13:45:45 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 13:45:45 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 13:45:45 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 13:45:45 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 13:45:45 - DroneVision - INFO - ==================================================
+2026-02-24 13:45:45 - DroneVision - INFO - 连接AirSim...
+2026-02-24 13:45:45 - DroneVision - INFO - 捕获并处理单帧...
+2026-02-24 13:45:45 - DroneVision - INFO - ========================================
+2026-02-24 13:45:45 - DroneVision - INFO - Frame 0
+2026-02-24 13:45:45 - DroneVision - INFO - Position: [-27.18565941  -4.21593523   0.62797302]
+2026-02-24 13:45:45 - DroneVision - INFO - Obstacle: closest=1.10m @ -50.0deg
+2026-02-24 13:58:11 - DroneVision - INFO - ==================================================
+2026-02-24 13:58:11 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 13:58:11 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 13:58:11 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 13:58:11 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 13:58:11 - DroneVision - INFO - ==================================================
+2026-02-24 13:58:11 - DroneVision - INFO - 连接AirSim...
+2026-02-24 13:58:11 - DroneVision - INFO - 捕获并处理单帧...
+2026-02-24 13:58:11 - DroneVision - INFO - ========================================
+2026-02-24 13:58:11 - DroneVision - INFO - Frame 0
+2026-02-24 13:58:11 - DroneVision - INFO - Position: [0.         0.         0.67942953]
+2026-02-24 13:58:11 - DroneVision - INFO - Obstacle: closest=0.87m @ -50.0deg
+2026-02-24 14:00:34 - DroneVision - INFO - ==================================================
+2026-02-24 14:00:34 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 14:00:34 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 14:00:34 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 14:00:34 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 14:00:34 - DroneVision - INFO - ==================================================
+2026-02-24 14:00:34 - DroneVision - INFO - 连接AirSim...
+2026-02-24 14:02:03 - DroneVision - INFO - ==================================================
+2026-02-24 14:02:03 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 14:02:03 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 14:02:03 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 14:02:03 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 14:02:03 - DroneVision - INFO - ==================================================
+2026-02-24 14:02:03 - DroneVision - INFO - 连接AirSim...
+2026-02-24 14:07:30 - DroneVision - INFO - ==================================================
+2026-02-24 14:07:30 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 14:07:30 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 14:07:30 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 14:07:30 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 14:07:30 - DroneVision - INFO - ==================================================
+2026-02-24 14:07:30 - DroneVision - INFO - 连接AirSim...
+2026-02-24 17:13:35 - DroneVision - INFO - ==================================================
+2026-02-24 17:13:35 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 17:13:35 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 17:13:35 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 17:13:35 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 17:13:35 - DroneVision - INFO - ==================================================
+2026-02-24 17:13:35 - DroneVision - INFO - 连接AirSim...
+2026-02-24 17:14:05 - DroneVision - INFO - ==================================================
+2026-02-24 17:14:05 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 17:14:05 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 17:14:05 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 17:14:05 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 17:14:05 - DroneVision - INFO - ==================================================
+2026-02-24 17:14:05 - DroneVision - INFO - 连接AirSim...
+2026-02-24 17:15:46 - DroneVision - INFO - ==================================================
+2026-02-24 17:15:46 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 17:15:46 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 17:15:46 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 17:15:46 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 17:15:46 - DroneVision - INFO - ==================================================
+2026-02-24 17:15:46 - DroneVision - INFO - 连接AirSim...
+2026-02-24 17:19:56 - DroneVision - INFO - ==================================================
+2026-02-24 17:19:56 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 17:19:56 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 17:19:56 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 17:19:56 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 17:19:56 - DroneVision - INFO - ==================================================
+2026-02-24 17:19:56 - DroneVision - INFO - 连接AirSim...
+2026-02-24 17:24:56 - DroneVision - INFO - ==================================================
+2026-02-24 17:24:56 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 17:24:56 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 17:24:56 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 17:24:56 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 17:24:56 - DroneVision - INFO - ==================================================
+2026-02-24 17:24:56 - DroneVision - INFO - 连接AirSim...
+2026-02-24 17:25:47 - DroneVision - INFO - ==================================================
+2026-02-24 17:25:47 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 17:25:47 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 17:25:47 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 17:25:47 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 17:25:47 - DroneVision - INFO - ==================================================
+2026-02-24 17:25:47 - DroneVision - INFO - 连接AirSim...
+2026-02-24 23:29:08 - DroneVision - INFO - ==================================================
+2026-02-24 23:29:08 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 23:29:08 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 23:29:08 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 23:29:08 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 23:29:08 - DroneVision - INFO - ==================================================
+2026-02-24 23:29:08 - DroneVision - INFO - 连接AirSim...
+2026-02-24 23:30:01 - DroneVision - INFO - ==================================================
+2026-02-24 23:30:01 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 23:30:01 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 23:30:01 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 23:30:01 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 23:30:01 - DroneVision - INFO - ==================================================
+2026-02-24 23:30:01 - DroneVision - INFO - 连接AirSim...
+2026-02-24 23:47:27 - DroneVision - INFO - ==================================================
+2026-02-24 23:47:27 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 23:47:27 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 23:47:27 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 23:47:27 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 23:47:27 - DroneVision - INFO - ==================================================
+2026-02-24 23:47:27 - DroneVision - INFO - 连接AirSim...
+2026-02-24 23:48:44 - DroneVision - INFO - ==================================================
+2026-02-24 23:48:44 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 23:48:44 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 23:48:44 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 23:48:44 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 23:48:44 - DroneVision - INFO - ==================================================
+2026-02-24 23:48:44 - DroneVision - INFO - 连接AirSim...
+2026-02-24 23:56:59 - DroneVision - INFO - ==================================================
+2026-02-24 23:56:59 - DroneVision - INFO - 日志系统初始化完成
+2026-02-24 23:56:59 - DroneVision - INFO - 日志级别: INFO
+2026-02-24 23:56:59 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-24 23:56:59 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-24 23:56:59 - DroneVision - INFO - ==================================================
+2026-02-24 23:56:59 - DroneVision - INFO - 连接AirSim...
+2026-02-25 00:01:01 - DroneVision - INFO - ==================================================
+2026-02-25 00:01:01 - DroneVision - INFO - 日志系统初始化完成
+2026-02-25 00:01:01 - DroneVision - INFO - 日志级别: INFO
+2026-02-25 00:01:01 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-25 00:01:01 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-25 00:01:01 - DroneVision - INFO - ==================================================
+2026-02-25 00:01:01 - DroneVision - INFO - 连接AirSim...
+2026-02-25 09:29:14 - DroneVision - INFO - ==================================================
+2026-02-25 09:29:14 - DroneVision - INFO - 日志系统初始化完成
+2026-02-25 09:29:14 - DroneVision - INFO - 日志级别: INFO
+2026-02-25 09:29:14 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-25 09:29:14 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-25 09:29:14 - DroneVision - INFO - ==================================================
+2026-02-25 09:29:14 - DroneVision - INFO - 连接AirSim...
+2026-02-25 09:29:46 - DroneVision - INFO - ==================================================
+2026-02-25 09:29:46 - DroneVision - INFO - 日志系统初始化完成
+2026-02-25 09:29:46 - DroneVision - INFO - 日志级别: INFO
+2026-02-25 09:29:46 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-25 09:29:46 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-25 09:29:46 - DroneVision - INFO - ==================================================
+2026-02-25 09:29:46 - DroneVision - INFO - 连接AirSim...
+2026-02-25 10:02:05 - DroneVision - INFO - ==================================================
+2026-02-25 10:02:05 - DroneVision - INFO - 日志系统初始化完成
+2026-02-25 10:02:05 - DroneVision - INFO - 日志级别: INFO
+2026-02-25 10:02:05 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-25 10:02:05 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-25 10:02:05 - DroneVision - INFO - ==================================================
+2026-02-25 10:02:05 - DroneVision - INFO - 连接AirSim...
+2026-02-25 10:08:59 - DroneVision - INFO - ==================================================
+2026-02-25 10:08:59 - DroneVision - INFO - 日志系统初始化完成
+2026-02-25 10:08:59 - DroneVision - INFO - 日志级别: INFO
+2026-02-25 10:08:59 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-25 10:08:59 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-25 10:08:59 - DroneVision - INFO - ==================================================
+2026-02-25 10:08:59 - DroneVision - INFO - 连接AirSim...
+2026-02-25 10:56:05 - DroneVision - INFO - ==================================================
+2026-02-25 10:56:05 - DroneVision - INFO - 日志系统初始化完成
+2026-02-25 10:56:05 - DroneVision - INFO - 日志级别: INFO
+2026-02-25 10:56:05 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-25 10:56:05 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-25 10:56:05 - DroneVision - INFO - ==================================================
+2026-02-25 10:56:05 - DroneVision - INFO - 连接AirSim...
+2026-02-25 11:02:16 - DroneVision - INFO - ==================================================
+2026-02-25 11:02:16 - DroneVision - INFO - 日志系统初始化完成
+2026-02-25 11:02:16 - DroneVision - INFO - 日志级别: INFO
+2026-02-25 11:02:16 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-25 11:02:16 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-25 11:02:16 - DroneVision - INFO - ==================================================
+2026-02-25 11:02:16 - DroneVision - INFO - 连接AirSim...
+2026-02-25 11:13:23 - DroneVision - INFO - ==================================================
+2026-02-25 11:13:23 - DroneVision - INFO - 日志系统初始化完成
+2026-02-25 11:13:23 - DroneVision - INFO - 日志级别: INFO
+2026-02-25 11:13:23 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-25 11:13:23 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-25 11:13:23 - DroneVision - INFO - ==================================================
+2026-02-25 11:13:23 - DroneVision - INFO - 连接AirSim...
+2026-02-25 11:13:55 - DroneVision - INFO - ==================================================
+2026-02-25 11:13:55 - DroneVision - INFO - 日志系统初始化完成
+2026-02-25 11:13:55 - DroneVision - INFO - 日志级别: INFO
+2026-02-25 11:13:55 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-25 11:13:55 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-25 11:13:55 - DroneVision - INFO - ==================================================
+2026-02-25 11:13:55 - DroneVision - INFO - 连接AirSim...
+2026-02-25 11:26:18 - DroneVision - INFO - ==================================================
+2026-02-25 11:26:18 - DroneVision - INFO - 日志系统初始化完成
+2026-02-25 11:26:18 - DroneVision - INFO - 日志级别: INFO
+2026-02-25 11:26:18 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-25 11:26:18 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-25 11:26:18 - DroneVision - INFO - ==================================================
+2026-02-25 11:26:18 - DroneVision - INFO - 连接AirSim...
+2026-02-25 11:29:51 - DroneVision - INFO - ==================================================
+2026-02-25 11:29:51 - DroneVision - INFO - 日志系统初始化完成
+2026-02-25 11:29:51 - DroneVision - INFO - 日志级别: INFO
+2026-02-25 11:29:51 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-25 11:29:51 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-25 11:29:51 - DroneVision - INFO - ==================================================
+2026-02-25 11:29:51 - DroneVision - INFO - 连接AirSim...
+2026-02-25 11:38:42 - DroneVision - INFO - ==================================================
+2026-02-25 11:38:42 - DroneVision - INFO - 日志系统初始化完成
+2026-02-25 11:38:42 - DroneVision - INFO - 日志级别: INFO
+2026-02-25 11:38:42 - DroneVision - INFO - 日志目录: AirSimAPIPipeline
+2026-02-25 11:38:42 - DroneVision - INFO - 日志文件: drone_vision.log
+2026-02-25 11:38:42 - DroneVision - INFO - ==================================================
+2026-02-25 11:38:42 - DroneVision - INFO - 连接AirSim...

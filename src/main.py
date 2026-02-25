@@ -14,7 +14,7 @@ import airsim
 import numpy as np  # 导入 numpy
 import os
 from datetime import datetime
-from multiprocessing import Process, Queue, Value
+from multiprocessing import Process, Queue, Value, Array
 
 # 添加必要的路径
 current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -35,7 +35,7 @@ from src.utils.logging_utils import get_logger
 from src.utils.keyboard_control import keyboard_control_process
 from src.utils.visualization import Visualizer
 
-def visual_processing_process(command_queue, should_stop):
+def visual_processing_process(command_queue, should_stop, velocity_state):
     """
     视觉处理进程（主进程）
 
@@ -47,6 +47,7 @@ def visual_processing_process(command_queue, should_stop):
     Args:
         command_queue: 进程间通信队列
         should_stop: 共享停止标志
+        velocity_state: 共享速度状态 [vx, vy, vz, active]
     """
     try:
         logger = get_logger(log_dir='logs', log_file='visual.log', log_level='INFO', log_to_file=True)
@@ -100,34 +101,44 @@ def visual_processing_process(command_queue, should_stop):
         logger.info("  d - 右移")
         logger.info("  , - 上升")
         logger.info("  . - 下降")
+        logger.info("  space - 停止所有运动")
         logger.info("  e - 捕获并处理两帧（间隔100ms）")
         logger.info("  v - 切换可视化显示（深度图+障碍物雷达）")
         logger.info("  q - 退出")
         logger.info("=" * 60)
 
         print("开始视频流捕获...\n多进程架构启动！")
-        print("键盘输入决定行为 :\n'e'键捕获并处理两帧（间隔100ms）\n'w'前进\n's'后退\n'a'左移\n'd'右移\n','上升\n'.'下降\n")
+        print("键盘输入决定行为 :\n'w'前进\n's'后退\n'a'左移\n'd'右移\n','上升\n'.'下降\n'空格'停止所有\n'e'捕获并处理两帧\n'v'可视化开关\n'q'退出\n")
+        
+        # 记录上一帧的速度状态，用于检测变化
+        last_velocity = [0.0, 0.0, 0.0]
         
         # 主循环
         while not should_stop.value:
             try:
-                # 1. 检查键盘命令（从队列读取）
+                # 1. 持续速度控制：检查速度状态变化并发送指令
+                current_velocity = [velocity_state[0], velocity_state[1], velocity_state[2]]
+                is_active = velocity_state[3] > 0
+                
+                # 如果速度发生变化，或者需要保持运动，则发送速度指令
+                if current_velocity != last_velocity or is_active:
+                    try:
+                        # 持续发送速度指令（duration很小，实现实时控制）
+                        client.moveByVelocityBodyFrameAsync(
+                            float(current_velocity[0]),
+                            float(current_velocity[1]),
+                            float(current_velocity[2]),
+                            0.05  # 50ms周期
+                        )
+                        last_velocity = current_velocity.copy()
+                    except Exception as e:
+                        logger.error(f"运动控制失败: {e}")
+                
+                # 2. 检查键盘命令（从队列读取）
                 while not command_queue.empty():
                     cmd_type, data = command_queue.get()
                     
-                    if cmd_type == 'move':
-                        direction = data['direction']
-                        dx = data['dx']
-                        dy = data['dy']
-                        dz = data['dz']
-                        
-                        logger.info(f"移动指令: {direction}")
-                        try:
-                            client.moveByVelocityBodyFrameAsync(dx, dy, dz, 0.1).join()
-                        except Exception as e:
-                            logger.error(f"移动失败: {e}")
-                    
-                    elif cmd_type == 'process':
+                    if cmd_type == 'process':
                         need_process = True
                         logger.info("收到处理指令: 捕获并处理两帧")
                     
@@ -141,7 +152,7 @@ def visual_processing_process(command_queue, should_stop):
                         should_stop.value = True
                         break
                 
-                # 2. 如果需要处理两帧
+                # 3. 如果需要处理两帧
                 if need_process:
                     need_process = False
                     display_frame = process_two_frames(
@@ -158,7 +169,7 @@ def visual_processing_process(command_queue, should_stop):
                     )
                     frame_counter += 1
                 
-                # 3. 显示图像（如果已捕获）
+                # 4. 显示图像（如果已捕获）
                 if display_frame is not None:
                     try:
                         # AirSim 返回的是 RGB，OpenCV 使用 BGR，用于正确显示颜色
@@ -170,7 +181,7 @@ def visual_processing_process(command_queue, should_stop):
                     except Exception as e:
                         print(f"显示图像时出错: {e}")
                 
-                # 4. 处理 GUI 事件，防止窗口变为未响应
+                # 5. 处理 GUI 事件，防止窗口变为未响应
                 cv2.waitKey(1)
                 
             except KeyboardInterrupt:
@@ -356,11 +367,15 @@ if __name__ == "__main__":
     should_stop = Value('b', False)
     command_queue = Queue()
     
+    # 创建速度状态共享变量 [vx, vy, vz, active]
+    # 用于持续速度控制模式
+    velocity_state = Array('d', [0.0, 0.0, 0.0, 0.0])
+    
     # 启动键盘控制进程
     main_logger.info("启动键盘控制进程...")
     keyboard_proc = Process(
         target=keyboard_control_process,
-        args=(command_queue, main_logger, should_stop)
+        args=(command_queue, main_logger, should_stop, velocity_state)
     )
     keyboard_proc.daemon = True  # 设置为守护进程，主进程退出时自动退出
     keyboard_proc.start()
@@ -370,7 +385,7 @@ if __name__ == "__main__":
     main_logger.info("启动视觉处理进程...")
     visual_proc = Process(
         target=visual_processing_process,
-        args=(command_queue, should_stop)
+        args=(command_queue, should_stop, velocity_state)
     )
     visual_proc.start()
     main_logger.info(f"视觉处理进程PID: {visual_proc.pid}")
